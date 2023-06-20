@@ -379,7 +379,7 @@ if lvl<0:
     lvl = 0
 
 print("amount of 5 star exp cards needed left")
-print("\n"+lvl)
+print(lvl)
 
 
 #amount for lvl 120
@@ -394,4 +394,4 @@ lvl120 = 426541500-(total+total2+total3)
 lvl120 = lvl120/81000
 
 print("amount of 5 star exp cards needed left")
-print("\n"+lvl120)
+print(lvl120)
