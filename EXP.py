@@ -10,8 +10,8 @@ sg.theme('SandyBeach')
 # Return values using
 # automatic-numbered keys
 layout = [
-	[sg.Text('Please enter the 5 star class exp card')],
-    [sg.Text('Character Class', size =(15, 1)), sg.InputText()],
+	[sg.Text('Please select the servant class you want to level up with 5 star EXP cards')],
+    [sg.DropDown(["Saber", "Archer", "Lancer", "Rider", "Caster", "Assassin", "Berserker", "Extra"])],
 	[sg.Text('Saber', size =(15, 1)), sg.InputText()],
     [sg.Text('Archer', size =(15, 1)), sg.InputText()],
     [sg.Text('Lancer', size =(15, 1)), sg.InputText()],
@@ -20,11 +20,29 @@ layout = [
     [sg.Text('Assassin', size =(15, 1)), sg.InputText()],
     [sg.Text('Berserker', size =(15, 1)), sg.InputText()],
     [sg.Text('All', size =(15, 1)), sg.InputText()],
-	[sg.Submit(), sg.Cancel()]
+	[sg.Submit(), sg.Cancel()],
+    [sg.Text(size=(20,1), key='-OUTPUT-')]
 ]
 
 window = sg.Window('FGO EXP calculator', layout)
-event, values = window.read()
+
+while True:
+    event, values = window.read()
+    if event == sg.WINDOW_CLOSED or event == 'Quit':
+        break
+
+    character = values[0]
+    Saber = int(values[1])
+    Archer = int(values[2])
+    Lancer = int(values[3])
+    Rider = int(values[4])
+    Caster = int(values[5])
+    Assassin = int(values[6])
+    Berserker = int(values[7])
+    All = int(values[8])
+
+    window['-OUTPUT-'].update()
+
 window.close()
 
 # The input data looks like a simple list
