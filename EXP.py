@@ -1,5 +1,21 @@
 import PySimpleGUI as sg
 
+# CONSTANTS
+SCEB = 1.20 # Same Card EXP Bonus 
+BASE_EXP_5 = 81000
+BASE_EXP_4 = 27000
+BASE_EXP_3 = 9000
+LV_100_MAX = 20311500
+LV_120_MAX = 426541500
+
+# Function to check for negative values in the input
+def has_negative(cards):
+    for card in cards:
+        if(card['5'] < 0 or card['4'] < 0 or card['3'] < 0):
+            return True;
+
+    return False;
+
 #getting the 5 star card exp 
 
 # Add some color
@@ -9,19 +25,25 @@ sg.theme('SandyBeach')
 # Very basic window.
 # Return values using
 # automatic-numbered keys
+
 layout = [
 	[sg.Text('Please select the servant class you want to level up with 5 star EXP cards')],
-    [sg.DropDown(["Saber", "Archer", "Lancer", "Rider", "Caster", "Assassin", "Berserker", "Extra"])],
-	[sg.Text('Saber', size =(15, 1)), sg.InputText()],
-    [sg.Text('Archer', size =(15, 1)), sg.InputText()],
-    [sg.Text('Lancer', size =(15, 1)), sg.InputText()],
-    [sg.Text('Rider', size =(15, 1)), sg.InputText()],
-    [sg.Text('Caster', size =(15, 1)), sg.InputText()],
-    [sg.Text('Assassin', size =(15, 1)), sg.InputText()],
-    [sg.Text('Berserker', size =(15, 1)), sg.InputText()],
-    [sg.Text('All', size =(15, 1)), sg.InputText()],
-	[sg.Submit(), sg.Cancel()],
-    [sg.Text(size=(20,1), key='-OUTPUT-')]
+    [sg.DropDown(["Saber", "Archer", "Lancer", "Rider", "Caster", "Assassin", "Berserker", "Extra"], size=(25, 1), default_value="Saber")],
+    [sg.Text('EXP Class Card', size=(15, 1)), sg.Text('5⭐', size=(15, 1)),sg.Text('4⭐', size=(15, 1)), sg.Text('3⭐', size=(15, 1))],
+	[sg.Text('Saber', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('Archer', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('Lancer', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('Rider', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('Caster', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('Assassin', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('Berserker', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text('All', size =(15, 1)), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0"), sg.InputText(size=(15, 1), default_text="0")],
+    [sg.Text(size=(60,1), key='-ERROR-', background_color="red", text_color="white", visible=False)],
+	[sg.Submit(), sg.Quit()],
+    [sg.Text(size=(60,1), key='-OUTPUT_100-')],
+    [sg.Text(size=(60,2), key='-OUTPUT_100_SAME-')],
+    [sg.Text(size=(60,1), key='-OUTPUT_120-')],
+    [sg.Text(size=(60,2), key='-OUTPUT_120_SAME-')]
 ]
 
 window = sg.Window('FGO EXP calculator', layout)
@@ -31,385 +53,157 @@ while True:
     if event == sg.WINDOW_CLOSED or event == 'Quit':
         break
 
-    character = values[0]
-    Saber = int(values[1])
-    Archer = int(values[2])
-    Lancer = int(values[3])
-    Rider = int(values[4])
-    Caster = int(values[5])
-    Assassin = int(values[6])
-    Berserker = int(values[7])
-    All = int(values[8])
+    try:
+        character = values[0].lower()
 
-    window['-OUTPUT-'].update()
+        SaberExp = {
+            'type': "saber",
+            '5': int(values[1]),
+            '4': int(values[2]),
+            '3': int(values[3])
+        }
+
+        ArcherExp = {
+            'type': "archer",
+            '5': int(values[4]),
+            '4': int(values[5]),
+            '3': int(values[6])
+        }
+
+        LancerExp = {
+            'type': "lancer",
+            '5': int(values[7]),
+            '4': int(values[8]),
+            '3': int(values[9])
+        }
+
+        RiderExp = {
+            'type': "rider",
+            '5': int(values[10]),
+            '4': int(values[11]),
+            '3': int(values[12])
+        }
+
+        CasterExp = {
+            'type': "caster",
+            '5': int(values[13]),
+            '4': int(values[14]),
+            '3': int(values[15])
+        }
+
+        AssassinExp = {
+            'type': "assassin",
+            '5': int(values[16]),
+            '4': int(values[17]),
+            '3': int(values[18])
+        }
+
+        BerserkerExp = {
+            'type': "berserker",
+            '5': int(values[19]),
+            '4': int(values[20]),
+            '3': int(values[21])
+        }
+
+        ExtraExp = {
+            'type': "extra",
+            '5': int(values[22]),
+            '4': int(values[23]),
+            '3': int(values[24])
+        }
+
+        cards = [SaberExp, ArcherExp, LancerExp, RiderExp, CasterExp, AssassinExp, BerserkerExp, ExtraExp]
+
+        if(has_negative(cards)): raise ValueError()
+
+        total_5exp = sum([card['5'] * BASE_EXP_5 if card['type'] != character else card['5'] * (BASE_EXP_5 * SCEB) for card in cards ])
+        total_4exp = sum([card['4'] * BASE_EXP_4 if card['type'] != character else card['4'] * (BASE_EXP_4 * SCEB) for card in cards ])
+        total_3exp = sum([card['3'] * BASE_EXP_3 if card['type'] != character else card['3'] * (BASE_EXP_3 * SCEB) for card in cards ])
+
+        #print the values for the amount of exp and how much exp is needed left to get different lvls
+        #amount needed for lvl 100
+        # --------------------------------------------------------------------------- #
+
+        total_exp = total_5exp + total_4exp + total_3exp
+        print("Total exp gained from cards is")
+        print(total_exp)
+
+        print("amount needed to get servant lvl 100")
+        final_total_100 = LV_100_MAX - total_exp
+
+        if final_total_100<=0:
+            final_total_100 = 0
+
+        print(final_total_100)
+
+        # --------------------------------------------------------------------------- #
+
+        cards_left_100 = final_total_100 / BASE_EXP_5
+
+        if cards_left_100 < 0:
+            cards_left_100 = 0
+
+        print("Amount of 5 star exp cards needed left to lv 100")
+        print(cards_left_100)
+
+        # --------------------------------------------------------------------------- #
+
+        cards_left_100_same = final_total_100 / (BASE_EXP_5 * SCEB);
+
+        if cards_left_100_same < 0:
+            cards_left_100_same = 0
+
+        print("Amount of 5 star exp cards of same class needed left to lv 100")
+        print(cards_left_100_same)
+
+        # --------------------------------------------------------------------------- #
+
+        #amount for lvl 120
+
+        print("amount needed to get servant lvl 120")
+        final_total_120 = LV_120_MAX - total_exp
+
+        if final_total_120<=0:
+            final_total_120 = 0
+
+        print(final_total_120)
+
+        # --------------------------------------------------------------------------- #
+
+        cards_left_120 = final_total_120 / BASE_EXP_5
+
+        if cards_left_120 < 0:
+            cards_left_120 = 0
+
+        print("Amount of 5 star exp cards needed left to lv 120")
+        print(cards_left_120)
+
+        # --------------------------------------------------------------------------- #
+
+        cards_left_120_same = final_total_120 / (BASE_EXP_5 * SCEB)
+
+        if cards_left_120_same < 0:
+            cards_left_120_same = 0
+
+        print("Amount of 5 star exp cards of same class needed left to lv 120")
+        print(cards_left_120_same)
+
+        # --------------------------------------------------------------------------- #
+
+        window['-OUTPUT_100-'].update(f"{round(cards_left_100)} <5⭐> EXP cards left to reach LV 100", text_color='green')
+        window['-OUTPUT_100_SAME-'].update(f"{round(cards_left_100_same)} <5⭐> EXP cards left of the same class to reach LV 100", text_color='green', background_color="yellow")
+
+        window['-OUTPUT_120-'].update(f"{round(cards_left_120)} <5⭐> EXP cards left to reach LV 120", text_color='green')
+        window['-OUTPUT_120_SAME-'].update(f"{round(cards_left_120_same)} <5⭐> EXP cards left of the same class to reach LV 120", text_color='green', background_color="yellow")
+       
+    except ValueError as ve:
+        window['-ERROR-'].update("Please enter only positive numbers for the amount of exp cards", visible=True)
+    except IndexError as ie:
+        window['-ERROR-'].update("Index Out of bounds. No clue how this happended", visible=True)
+    except:
+        window['-ERROR-'].update("Some unknown error happened", visible=True)
 
 window.close()
 
-# The input data looks like a simple list
-# when automatic numbered
-character = values[0]
-Saber = int(values[1])
-Archer = int(values[2])
-Lancer = int(values[3])
-Rider = int(values[4])
-Caster = int(values[5])
-Assassin = int(values[6])
-Berserker = int(values[7])
-All = int(values[8])
-
-if character == "Saber" or character == "saber":
-    Saber = Saber*97200
-    Archer = Archer * 81000
-    Lancer = Lancer * 81000
-    Rider = Rider * 81000
-    Caster = Caster * 81000
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All  
-if character == "Archer" or character == "archer":
-    Saber = Saber*81000
-    Archer = Archer * 97200
-    Lancer = Lancer * 81000
-    Rider = Rider * 81000
-    Caster = Caster * 81000
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All  
-if character == "Lancer" or character == "lancer":
-    Saber = Saber*81000
-    Archer = Archer * 81000
-    Lancer = Lancer * 97200
-    Rider = Rider * 81000
-    Caster = Caster * 81000
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All   
-if character == "Rider" or character == "rider":
-    Saber = Saber*81000
-    Archer = Archer * 81000
-    Lancer = Lancer * 81000
-    Rider = Rider * 97200
-    Caster = Caster * 81000
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All   
-if character == "Caster" or character == "caster":
-    Saber = Saber*81000
-    Archer = Archer * 81000
-    Lancer = Lancer * 81000
-    Rider = Rider * 81000
-    Caster = Caster * 97200
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All   
-if character == "Assassin" or character == "assassin":
-    Saber = Saber*81000
-    Archer = Archer * 81000
-    Lancer = Lancer * 81000
-    Rider = Rider * 81000
-    Caster = Caster * 81000
-    Assassin = Assassin * 97200
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All   
-if character == "Berserker" or character == "berserker":
-    Saber = Saber*81000
-    Archer = Archer * 81000
-    Lancer = Lancer * 81000
-    Rider = Rider * 81000
-    Caster = Caster * 81000
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 97200
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All   
-if character == "All" or character == "all":
-    Saber = Saber*81000
-    Archer = Archer * 81000
-    Lancer = Lancer * 81000
-    Rider = Rider * 81000
-    Caster = Caster * 81000
-    Assassin = Assassin * 81000
-    Berserker = Berserker * 81000
-    All = All * 97200
-    total = Saber+Archer+Lancer+Rider+Caster+Assassin+Berserker+All   
-    
-print(total)
-
-#getting the 4 star card exp 
-
-# Add some color
-# to the window
-sg.theme('SandyBeach')	
-
-# Very basic window.
-# Return values using
-# automatic-numbered keys
-layout = [
-	[sg.Text('Please enter the 4 star class exp card')],
-	[sg.Text('Saber', size =(15, 1)), sg.InputText()],
-    [sg.Text('Archer', size =(15, 1)), sg.InputText()],
-    [sg.Text('Lancer', size =(15, 1)), sg.InputText()],
-    [sg.Text('Rider', size =(15, 1)), sg.InputText()],
-    [sg.Text('Caster', size =(15, 1)), sg.InputText()],
-    [sg.Text('Assassin', size =(15, 1)), sg.InputText()],
-    [sg.Text('Berserker', size =(15, 1)), sg.InputText()],
-    [sg.Text('All', size =(15, 1)), sg.InputText()],
-	[sg.Submit(), sg.Cancel()]
-]
-
-window = sg.Window('FGO EXP calculator', layout)
-event, values1 = window.read()
-window.close()
 
 
-Saber4 = int(values1[0])
-Archer4 = int(values1[1])
-Lancer4 = int(values1[2])
-Rider4 = int(values1[3])
-Caster4 = int(values1[4])
-Assassin4 = int(values1[5])
-Berserker4 = int(values1[6])
-All4 = int(values1[7])
-
-if character == "Saber" or character == "saber":
-    Saber4 = Saber4 *32400
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4  
-if character == "Archer" or character == "archer":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 32400
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4   
-if character == "Lancer" or character == "lancer":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 32400
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4    
-if character == "Rider" or character == "rider":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 32400
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4     
-if character == "Caster" or character == "caster":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 32400
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4    
-if character == "Assassin" or character == "assassin":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 32400
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4   
-if character == "Berserker" or character == "berserker":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 32400
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4  
-if character == "All" or character == "all":
-    Saber4 = Saber4 *27000
-    Archer4 = Archer4 * 27000
-    Lancer4 = Lancer4 * 27000
-    Rider4 = Rider4 * 27000
-    Caster4 = Caster4 * 27000
-    Assassin4 = Assassin4 * 27000
-    Berserker4 = Berserker4 * 27000
-    All4 = All4 * 32400
-    total2 = Saber4+Archer4+Lancer4+Rider4+Caster4+Assassin4+Berserker4+All4  
-    
-print(total2)
-
-#getting the 3 star card exp 
-
-# Add some color
-# to the window
-sg.theme('SandyBeach')	
-
-# Very basic window.
-# Return values using
-# automatic-numbered keys
-layout = [
-	[sg.Text('Please enter the 3 star class exp card')],
-	[sg.Text('Saber', size =(15, 1)), sg.InputText()],
-    [sg.Text('Archer', size =(15, 1)), sg.InputText()],
-    [sg.Text('Lancer', size =(15, 1)), sg.InputText()],
-    [sg.Text('Rider', size =(15, 1)), sg.InputText()],
-    [sg.Text('Caster', size =(15, 1)), sg.InputText()],
-    [sg.Text('Assassin', size =(15, 1)), sg.InputText()],
-    [sg.Text('Berserker', size =(15, 1)), sg.InputText()],
-    [sg.Text('All', size =(15, 1)), sg.InputText()],
-	[sg.Submit(), sg.Cancel()]
-]
-
-window = sg.Window('FGO EXP calculator', layout)
-event, values2 = window.read()
-window.close()
-
-
-Saber3 = int(values2[0])
-Archer3 = int(values2[1])
-Lancer3 = int(values2[2])
-Rider3 = int(values2[3])
-Caster3 = int(values2[4])
-Assassin3 = int(values2[5])
-Berserker3 = int(values2[6])
-All3 = int(values2[7])
-
-if character == "Saber" or character == "saber":
-    Saber3 = Saber3 *10800
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 9000
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3  
-if character == "Archer" or character == "archer":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 10800
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 9000
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3 
-if character == "Lancer" or character == "lancer":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 10800
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 9000
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3    
-if character == "Rider" or character == "rider":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 10800
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 9000
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3     
-if character == "Caster" or character == "caster":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 10800
-    Assassin3 = Assassin3 * 9000
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3   
-if character == "Assassin" or character == "assassin":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 10800
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3    
-if character == "Berserker" or character == "berserker":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 10800
-    Berserker3 = Berserker3 * 9000
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3  
-if character == "All" or character == "all":
-    Saber3 = Saber3 *9000
-    Archer3 = Archer3 * 9000
-    Lancer3 = Lancer3 * 9000
-    Rider3 = Rider3 * 9000
-    Caster3 = Caster3 * 9000
-    Assassin3 = Assassin3 * 9000
-    Berserker3 = Berserker3 * 10800
-    All3 = All3 * 10800
-    total3 = Saber3+Archer3+Lancer3+Rider3+Caster3+Assassin3+Berserker3+All3 
-    
-print(total3)
-
-#print the values for the amount of exp and how much exp is needed left to get different lvls
-#amount needed for lvl 100
-print("Total exp gained from cards is")
-print(total+total2+total3)
-
-print("amount needed to get servant lvl 100")
-finaltotal100 = 20311500-(total+total2+total3)
-if finaltotal100<=0:
-    finaltotal100 = 0
-    
-print(finaltotal100)
-
-lvl = 20311500-(total+total2+total3)
-lvl = lvl/81000
-
-if lvl<0:
-    lvl = 0
-
-print("amount of 5 star exp cards needed left")
-print(lvl)
-
-
-#amount for lvl 120
-
-print("amount needed to get servant lvl 120")
-finaltotal120 = 426541500-(total+total2+total3)
-if finaltotal120<=0:
-    finaltotal120 = 0
-print(finaltotal120)
-
-lvl120 = 426541500-(total+total2+total3)
-lvl120 = lvl120/81000
-
-print("amount of 5 star exp cards needed left")
-print(lvl120)
